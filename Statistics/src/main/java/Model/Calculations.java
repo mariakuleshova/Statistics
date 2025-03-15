@@ -46,7 +46,6 @@ private DescriptiveStatistics stats;
     
     // Коэффициент ковариации 
     public double cov(double[] x, double[] y){ 
-    stats = new DescriptiveStatistics(x);
     Covariance covariance = new Covariance();
     return covariance.covariance(x, y);
     }

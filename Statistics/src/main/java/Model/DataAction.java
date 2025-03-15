@@ -33,9 +33,12 @@ public class DataAction {
             List<Double> columnData = new ArrayList<>();
             for (Row row : sheet) {
                 Cell cell = row.getCell(colIdx);
-                if (cell != null && cell.getCellType() == CellType.NUMERIC) {
-                    columnData.add(cell.getNumericCellValue());
+                if (cell != null) {
+                    cell.removeFormula();
+                    if (cell.getCellType() == CellType.NUMERIC) {
+                        columnData.add(cell.getNumericCellValue());
                 }
+                }   
             }
             if (!columnData.isEmpty()) {
                 importedData.add(columnData.stream().mapToDouble(Double::doubleValue).toArray());

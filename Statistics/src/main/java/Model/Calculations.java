@@ -7,6 +7,7 @@ package Model;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 /**
@@ -16,7 +17,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class Calculations {
 private DescriptiveStatistics stats;
     
-    public double geomMean(double[] x){
+    // Среднее геометрическое
+    public double geomMean(double[] x){ 
 //    for (int i = 0; i < x.length; i++){
 //            x[i]= Math.abs(x[i]);
 //        }
@@ -24,63 +26,70 @@ private DescriptiveStatistics stats;
     return stats.getGeometricMean(); 
     }
     
+    // Среднее арифметическое
     public double arithMean(double[] x){ 
     stats = new DescriptiveStatistics(x);
     return stats.getMean();
     }
     
+    // Оценка стандартного отклонения
     public double std(double[] x){ 
     stats = new DescriptiveStatistics(x);
     return stats.getStandardDeviation();
     }
     
+    // Размах
     public double range(double[] x){ 
     stats = new DescriptiveStatistics(x);
     return max(x) - min(x); 
     }
     
-    public double cov(double[] x, double[] y){ //коэффициент ковариации 
+    // Коэффициент ковариации 
+    public double cov(double[] x, double[] y){ 
     stats = new DescriptiveStatistics(x);
     Covariance covariance = new Covariance();
     return covariance.covariance(x, y);
     }
     
+    // Количество элементов
     public long volume(double[] x){
     stats = new DescriptiveStatistics(x);
     return stats.getN();
     }
     
-    public double variation(double[] x){ //коэффициент вариации
+    // Коэффициент вариации
+    public double variation(double[] x){ 
     stats = new DescriptiveStatistics(x);
     return (std(x) / arithMean(x)) * 100; 
     }
     
-    public double[] conInterval(double[] x){ //доверительный интервал 
+    // Доверительный интервал 
+    public double[] conInterval(double[] x){   
+    double confidenceLevel = 0.95;
+    double alpha = 1 - confidenceLevel;
+    TDistribution tDistribution = new TDistribution((int) volume(x) - 1);
+    double tValue = tDistribution.inverseCumulativeProbability(1 - alpha / 2);
+        
     stats = new DescriptiveStatistics(x);
-    double leftLimit = arithMean(x) - 1.96 * (std(x) / volume(x));
-    double rightLimit = arithMean(x) + 1.96 * (std(x) / volume(x));
-    double[] CI = {leftLimit, rightLimit};
-    return CI;
-    
-//    stats = new DescriptiveStatistics(x);
-//        double tValue = 1.96;
-//        double se = stats.getStandardDeviation() / Math.sqrt(stats.getN());
-//        return new double[]{
-//            stats.getMean() - tValue * se,
-//            stats.getMean() + tValue * se
-//        };
+    double leftLimit = arithMean(x) - tValue * (std(x) / Math.sqrt(volume(x)));
+    double rightLimit = arithMean(x) + tValue * (std(x) / Math.sqrt(volume(x)));
+    double[] ci = {leftLimit, rightLimit};
+    return ci;
     }
     
+    // Дисперсия
     public double var(double[] x){
     stats = new DescriptiveStatistics(x);
     return stats.getVariance();
     }
     
+    // Минимум
     public double min(double[] x){
     stats = new DescriptiveStatistics(x);
     return stats.getMin();
     }
     
+    // Максимум
     public double max(double[] x){
     stats = new DescriptiveStatistics(x);
     return stats.getMax();
@@ -89,22 +98,27 @@ private DescriptiveStatistics stats;
     
     public Map<String, Double> calculateSampleStats(double[] currentSample) {
         Map<String, Double> statistics = new LinkedHashMap<>();
-        DescriptiveStatistics ds = new DescriptiveStatistics(currentSample);
+//        DescriptiveStatistics ds = new DescriptiveStatistics(currentSample);
 
-        statistics.put("Среднее арифметическое", ds.getMean());
-        statistics.put("Среднее геометрическое", ds.getGeometricMean());
-        statistics.put("Стандартное отклонение", ds.getStandardDeviation());
-        statistics.put("Размах", ds.getMax() - ds.getMin());
-        statistics.put("Дисперсия", ds.getVariance());
-        statistics.put("Коэффициент вариации (%)", (ds.getStandardDeviation() / ds.getMean()) * 100);
-        statistics.put("Минимум", ds.getMin());
-        statistics.put("Максимум", ds.getMax());
-        statistics.put("Количество элементов", (double) ds.getN());
-
+        statistics.put("Среднее геометрическое", geomMean(currentSample));
+        statistics.put("Среднее арифметическое", arithMean(currentSample));     
+        statistics.put("Стандартное отклонение", std(currentSample));
+        statistics.put("Размах", range(currentSample));
+        statistics.put("Количество элементов", (double) volume(currentSample));
+        statistics.put("Коэффициент вариации (%)", variation(currentSample));
+        
+        double[] ci = conInterval(currentSample);
+        statistics.put("Доверительный интервал (нижняя граница)", ci[0]);
+        statistics.put("Доверительный интервал (верхняя граница)", ci[1]);
+       
+        statistics.put("Дисперсия", var(currentSample));
+        statistics.put("Максимум", max(currentSample));
+        statistics.put("Минимум", min(currentSample));
+        
         return statistics;
     }
     
-    // Создание ковариационной матрицы (все пары выборок)
+    // Ковариационная матрица (все пары выборок)
     public double[][] calculateCovarianceMatrix(List<double[]> samples) {
         int n = samples.size();
         double[][] matrix = new double[n][n];
@@ -116,5 +130,4 @@ private DescriptiveStatistics stats;
         }
         return matrix;
     }
-    
 }

@@ -128,6 +128,10 @@ public class View extends javax.swing.JFrame {
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+    if (control.getSampleStats().isEmpty()) {
+        JOptionPane.showMessageDialog(this,"Ошибка: значения не вычислены или данные не загружены", "Ошибка", JOptionPane.ERROR_MESSAGE);
+    }
+    else {
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Сохранить результаты");
     fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
@@ -142,6 +146,7 @@ public class View extends javax.swing.JFrame {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
+    }
     }
     }//GEN-LAST:event_exportButtonActionPerformed
 

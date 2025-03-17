@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class View extends javax.swing.JFrame {
 
-    Controller control = new Controller();
+    private Controller control = new Controller();
     /**
      * Creates new form View
      */
@@ -107,12 +107,6 @@ public class View extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-//       try {
-//            control.printData("/Users/maria/Downloads/laba1.xlsx");
-//        } catch (IOException ex) {
-//            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Загрузить данные");
     fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
@@ -131,7 +125,6 @@ public class View extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Некорректные данные в файле:\n" + ex.getMessage(), "Ошибка", JOptionPane.WARNING_MESSAGE);
         }
     }
-
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
